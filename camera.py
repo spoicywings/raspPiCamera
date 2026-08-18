@@ -80,10 +80,10 @@ def take_photo():
         timestamp + ".jpg"
     )
 
-    dng_path = os.path.join(
-        PHOTO_DIR,
-        timestamp + ".dng"
-    )
+    #dng_path = os.path.join(
+    #    PHOTO_DIR,
+    #    timestamp + ".dng"
+    #)
 
     print()
     print("Capturing JPEG:")
@@ -113,16 +113,16 @@ def take_photo():
 
     # Capture RAW
 
-    raw = picam2.capture_array("raw")
+    #raw = picam2.capture_array("raw")
 
-    with open(dng_path, "wb") as f:
+    #with open(dng_path, "wb") as f:
 
-        f.write(raw.tobytes())
+    #    f.write(raw.tobytes())
 
 
     print("Saved:")
     print(jpg_path)
-    print(dng_path)
+    #print(dng_path)
 
 
     # Return to preview
@@ -176,7 +176,7 @@ try:
 
 
         elif key in ("q", "Q"):
-            
+
             break
 
 
