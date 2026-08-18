@@ -175,8 +175,8 @@ try:
             take_photo()
 
 
-        elif key.lower() == "q":
-
+        elif key in ("q", "Q"):
+            
             break
 
 
