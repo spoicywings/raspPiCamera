@@ -9,7 +9,8 @@ from input import CameraInput
 from screens import Screen
 from navigation import Navigation
 from navigation_renderer import NavigationRenderer
-
+from gallery import Gallery
+from gallery_renderer import GalleryRenderer
 
 # Folder for saved photos
 PHOTO_DIR = "/home/johnny_pi/camera/photos"
@@ -47,6 +48,8 @@ camera_input = CameraInput()
 current_screen = Screen.PREVIEW
 navigation = Navigation()
 navigation_renderer = NavigationRenderer()
+gallery = Gallery(PHOTO_DIR)
+gallery_renderer = GalleryRenderer()
 
 # -----------------------------
 # Take photo
@@ -231,29 +234,116 @@ try:
         # -------------------------
 
         elif current_screen == Screen.GALLERY:
+            photo_path = gallery.current_photo()
+        # -------------------------
+        # No photos
+        # -------------------------
 
-            # Temporary placeholder
+            if photo_path is None:
 
-            gallery_image = Image.new(
-                "RGB",
-                (320, 240),
-                "black"
+                gallery_image = Image.new(
+                    "RGB",
+                    (320, 240),
+                    "black"
+                )
+
+                draw = ImageDraw.Draw(gallery_image)
+
+                draw.text(
+                    (120, 100),
+                    "NO PHOTOS",
+                    fill="white"
+                )
+
+
+            # -------------------------
+            # Display photo
+            # -------------------------
+
+            else:
+
+                photo = Image.open(photo_path)
+
+                photo = photo.convert("RGB")
+
+                photo.thumbnail((320, 200))
+
+
+                gallery_image = Image.new(
+                    "RGB",
+                    (320, 240),
+                    "black"
+                )
+
+
+                x = (
+                    320 -
+                    photo.width
+                ) // 2
+
+                y = (
+                    35 +
+                    (205 - photo.height) // 2
+                )
+
+
+                gallery_image.paste(
+                    photo,
+                    (x, y)
+                )
+
+
+            # -------------------------
+            # Draw Gallery navigation
+            # -------------------------
+
+            gallery_image = gallery_renderer.draw(
+                gallery_image,
+                gallery
             )
 
-            draw = ImageDraw.Draw(gallery_image)
-
-            draw.text(
-                (120, 110),
-                "GALLERY",
-                fill="white"
-            )
 
             display.show(gallery_image)
 
 
-            if command == "SELECT":
+            # -------------------------
+            # Gallery controls
+            # -------------------------
 
-                current_screen = Screen.PREVIEW
+            if command == "LEFT":
+
+                gallery.menu_left()
+
+
+            elif command == "RIGHT":
+
+                gallery.menu_right()
+
+
+            elif command == "SELECT":
+
+                selected = gallery.current_menu()
+
+
+                # PREVIOUS
+
+                if selected == 0:
+
+                    gallery.previous_photo()
+
+
+                # NEXT
+
+                elif selected == 1:
+
+                    gallery.next_photo()
+
+
+                # BACK
+
+                elif selected == 2:
+
+                    current_screen = Screen.PREVIEW
 
 
         # -------------------------
