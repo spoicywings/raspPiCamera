@@ -234,10 +234,59 @@ try:
         # -------------------------
 
         elif current_screen == Screen.GALLERY:
+          # -------------------------
+          # Handle input
+          # -------------------------
+
+        if command == "LEFT":
+
+            gallery.menu_left()
+
+
+        elif command == "RIGHT":
+
+            gallery.menu_right()
+
+
+        elif command == "SELECT":
+
+            selected = gallery.current_menu()
+
+
+            # PREVIOUS
+
+            if selected == 0:
+
+                gallery.previous_photo()
+
+
+            # NEXT
+
+            elif selected == 1:
+
+                gallery.next_photo()
+
+
+            # BACK
+
+            elif selected == 2:
+
+                current_screen = Screen.PREVIEW
+
+                # Force preview to redraw
+                continue
+
+
+        # -------------------------
+        # Draw Gallery
+        # -------------------------
+
+        if gallery.needs_redraw:
+
             photo_path = gallery.current_photo()
-        # -------------------------
-        # No photos
-        # -------------------------
+            # -------------------------
+            # No photos
+            # -------------------------
 
             if photo_path is None:
 
@@ -247,7 +296,9 @@ try:
                     "black"
                 )
 
-                draw = ImageDraw.Draw(gallery_image)
+                draw = ImageDraw.Draw(
+                    gallery_image
+                )
 
                 draw.text(
                     (120, 100),
@@ -262,11 +313,17 @@ try:
 
             else:
 
-                photo = Image.open(photo_path)
+                photo = Image.open(
+                    photo_path
+                )
 
-                photo = photo.convert("RGB")
+                photo = photo.convert(
+                    "RGB"
+                )
 
-                photo.thumbnail((320, 200))
+                photo.thumbnail(
+                    (320, 200)
+                )
 
 
                 gallery_image = Image.new(
@@ -280,6 +337,7 @@ try:
                     320 -
                     photo.width
                 ) // 2
+
 
                 y = (
                     35 +
@@ -303,52 +361,23 @@ try:
             )
 
 
-            display.show(gallery_image)
+            # -------------------------
+            # Send to LCD
+            # -------------------------
+
+            display.show(
+                gallery_image
+            )
+
+
+            # Gallery is now up to date
+
+            gallery.mark_clean()
 
 
             # -------------------------
-            # Gallery controls
+            # SETTINGS
             # -------------------------
-
-            if command == "LEFT":
-
-                gallery.menu_left()
-
-
-            elif command == "RIGHT":
-
-                gallery.menu_right()
-
-
-            elif command == "SELECT":
-
-                selected = gallery.current_menu()
-
-
-                # PREVIOUS
-
-                if selected == 0:
-
-                    gallery.previous_photo()
-
-
-                # NEXT
-
-                elif selected == 1:
-
-                    gallery.next_photo()
-
-
-                # BACK
-
-                elif selected == 2:
-
-                    current_screen = Screen.PREVIEW
-
-
-        # -------------------------
-        # SETTINGS
-        # -------------------------
 
         elif current_screen == Screen.SETTINGS:
 
