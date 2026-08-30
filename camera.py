@@ -9,25 +9,14 @@ import termios
 import tty
 import select
 from datetime import datetime
+from input import CameraInput
+
 
 
 # Folder for saved photos
 PHOTO_DIR = "/home/johnny_pi/camera/photos"
 
 os.makedirs(PHOTO_DIR, exist_ok=True)
-
-
-# -----------------------------
-# Keyboard input
-# -----------------------------
-
-def keyboard_input():
-
-    if select.select([sys.stdin], [], [], 0)[0]:
-
-        return sys.stdin.read(1)
-
-    return None
 
 
 # -----------------------------
@@ -56,15 +45,7 @@ picam2.start()
 
 time.sleep(2)
 
-
-# -----------------------------
-# Keyboard setup
-# -----------------------------
-
-old_settings = termios.tcgetattr(sys.stdin)
-
-tty.setcbreak(sys.stdin.fileno())
-
+camera_input = CameraInput()
 
 # -----------------------------
 # Take photo
@@ -192,15 +173,15 @@ try:
 
         # Check keyboard
 
-        key = keyboard_input()
+        command = camera_input.get_command()
 
 
-        if key == " ":
+        if command == "TAKE_PHOTO":
 
             take_photo()
 
 
-        elif key in ("q", "Q"):
+        elif command == "QUIT":
 
             break
 
@@ -212,13 +193,7 @@ except KeyboardInterrupt:
 
 finally:
 
-    # Restore terminal
-
-    termios.tcsetattr(
-        sys.stdin,
-        termios.TCSADRAIN,
-        old_settings
-    )
+    camera_input.close()
 
 
     # Stop camera
