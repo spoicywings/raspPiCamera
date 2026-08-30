@@ -238,146 +238,146 @@ try:
           # Handle input
           # -------------------------
 
-        if command == "LEFT":
+            if command == "LEFT":
 
-            gallery.menu_left()
-
-
-        elif command == "RIGHT":
-
-            gallery.menu_right()
+                gallery.menu_left()
 
 
-        elif command == "SELECT":
+            elif command == "RIGHT":
 
-            selected = gallery.current_menu()
-
-
-            # PREVIOUS
-
-            if selected == 0:
-
-                gallery.previous_photo()
+                gallery.menu_right()
 
 
-            # NEXT
+            elif command == "SELECT":
 
-            elif selected == 1:
-
-                gallery.next_photo()
+                selected = gallery.current_menu()
 
 
-            # BACK
+                # PREVIOUS
 
-            elif selected == 2:
+                if selected == 0:
 
-                current_screen = Screen.PREVIEW
-
-                # Force preview to redraw
-                continue
+                    gallery.previous_photo()
 
 
-        # -------------------------
-        # Draw Gallery
-        # -------------------------
+                # NEXT
 
-        if gallery.needs_redraw:
+                elif selected == 1:
 
-            photo_path = gallery.current_photo()
+                    gallery.next_photo()
+
+
+                # BACK
+
+                elif selected == 2:
+
+                    current_screen = Screen.PREVIEW
+
+                    # Force preview to redraw
+                    continue
+
+
             # -------------------------
-            # No photos
+            # Draw Gallery
             # -------------------------
 
-            if photo_path is None:
+            if gallery.needs_redraw:
 
-                gallery_image = Image.new(
-                    "RGB",
-                    (320, 240),
-                    "black"
+                photo_path = gallery.current_photo()
+                # -------------------------
+                # No photos
+                # -------------------------
+
+                if photo_path is None:
+
+                    gallery_image = Image.new(
+                        "RGB",
+                        (320, 240),
+                        "black"
+                    )
+
+                    draw = ImageDraw.Draw(
+                        gallery_image
+                    )
+
+                    draw.text(
+                        (120, 100),
+                        "NO PHOTOS",
+                        fill="white"
+                    )
+
+
+                # -------------------------
+                # Display photo
+                # -------------------------
+
+                else:
+
+                    photo = Image.open(
+                        photo_path
+                    )
+
+                    photo = photo.convert(
+                        "RGB"
+                    )
+
+                    photo.thumbnail(
+                        (320, 200)
+                    )
+
+
+                    gallery_image = Image.new(
+                        "RGB",
+                        (320, 240),
+                        "black"
+                    )
+
+
+                    x = (
+                        320 -
+                        photo.width
+                    ) // 2
+
+
+                    y = (
+                        35 +
+                        (205 - photo.height) // 2
+                    )
+
+
+                    gallery_image.paste(
+                        photo,
+                        (x, y)
+                    )
+
+
+                # -------------------------
+                # Draw Gallery navigation
+                # -------------------------
+
+                gallery_image = gallery_renderer.draw(
+                    gallery_image,
+                    gallery
                 )
 
-                draw = ImageDraw.Draw(
+
+                # -------------------------
+                # Send to LCD
+                # -------------------------
+
+                display.show(
                     gallery_image
                 )
 
-                draw.text(
-                    (120, 100),
-                    "NO PHOTOS",
-                    fill="white"
-                )
+
+                # Gallery is now up to date
+
+                gallery.mark_clean()
 
 
-            # -------------------------
-            # Display photo
-            # -------------------------
-
-            else:
-
-                photo = Image.open(
-                    photo_path
-                )
-
-                photo = photo.convert(
-                    "RGB"
-                )
-
-                photo.thumbnail(
-                    (320, 200)
-                )
-
-
-                gallery_image = Image.new(
-                    "RGB",
-                    (320, 240),
-                    "black"
-                )
-
-
-                x = (
-                    320 -
-                    photo.width
-                ) // 2
-
-
-                y = (
-                    35 +
-                    (205 - photo.height) // 2
-                )
-
-
-                gallery_image.paste(
-                    photo,
-                    (x, y)
-                )
-
-
-            # -------------------------
-            # Draw Gallery navigation
-            # -------------------------
-
-            gallery_image = gallery_renderer.draw(
-                gallery_image,
-                gallery
-            )
-
-
-            # -------------------------
-            # Send to LCD
-            # -------------------------
-
-            display.show(
-                gallery_image
-            )
-
-
-            # Gallery is now up to date
-
-            gallery.mark_clean()
-
-
-            # -------------------------
-            # SETTINGS
-            # -------------------------
+                # -------------------------
+                # SETTINGS
+                # -------------------------
 
         elif current_screen == Screen.SETTINGS:
 
