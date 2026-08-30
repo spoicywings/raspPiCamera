@@ -31,6 +31,9 @@ class CameraInput:
             elif key in ("q", "Q"):
                 return "QUIT"
 
+            elif key == "\x1b":
+                return "BACK"
+
         return None
 
 

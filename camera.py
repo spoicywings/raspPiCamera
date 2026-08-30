@@ -10,7 +10,7 @@ import tty
 import select
 from datetime import datetime
 from input import CameraInput
-
+from screens import Screen
 
 
 # Folder for saved photos
@@ -46,6 +46,7 @@ picam2.start()
 time.sleep(2)
 
 camera_input = CameraInput()
+current_screen = Screen.PREVIEW
 
 # -----------------------------
 # Take photo
@@ -151,39 +152,70 @@ try:
 
     while True:
 
-        # Capture preview
-
-        frame = picam2.capture_array()
-
-
-        # Fix colour order
-
-        frame = frame[:, :, ::-1]
-
-
-        # Convert to PIL image
-
-        image = Image.fromarray(frame)
-
-
-        # Display
-
-        display.show(image)
-
-
-        # Check keyboard
-
         command = camera_input.get_command()
 
 
-        if command == "TAKE_PHOTO":
+    # -------------------------
+    # PREVIEW
+    # -------------------------
 
-            take_photo()
+        if current_screen == Screen.PREVIEW:
+
+        # Capture preview frame
+            frame = picam2.capture_array()
+
+        # Fix colour order
+            frame = frame[:, :, ::-1]
+
+        # Convert to PIL image
+            image = Image.fromarray(frame)
+
+        # Display
+            display.show(image)
 
 
-        elif command == "QUIT":
+        # Handle commands
+            if command == "TAKE_PHOTO":
+                take_photo()
 
-            break
+
+            elif command == "GALLERY":
+                current_screen = Screen.GALLERY
+                print("Gallery selected")
+
+            elif command == "MENU":
+                current_screen = Screen.MENU
+                print("Menu selected")
+            elif command == "QUIT":
+                break
+
+
+    # -------------------------
+    # GALLERY
+    # -------------------------
+
+        elif current_screen == Screen.GALLERY:
+            print("Gallery screen")
+
+            if command == "BACK":
+                current_screen = Screen.PREVIEW
+
+            elif command == "QUIT":
+                break
+
+
+    # -------------------------
+    # MENU
+    # -------------------------
+
+        elif current_screen == Screen.MENU:
+            print("Menu screen")
+
+            if command == "BACK":
+                current_screen = Screen.PREVIEW
+
+            elif command == "QUIT":
+                break
 
 
 except KeyboardInterrupt:
