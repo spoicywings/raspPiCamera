@@ -4,13 +4,11 @@ from PIL import ImageDraw
 from display import Display
 import time
 import os
-import sys
-import termios
-import tty
-import select
 from datetime import datetime
 from input import CameraInput
 from screens import Screen
+from navigation import Navigation
+from navigation_renderer import NavigationRenderer
 
 
 # Folder for saved photos
@@ -47,6 +45,8 @@ time.sleep(2)
 
 camera_input = CameraInput()
 current_screen = Screen.PREVIEW
+navigation = Navigation()
+navigation_renderer = NavigationRenderer()
 
 # -----------------------------
 # Take photo
@@ -149,74 +149,166 @@ try:
     print("Q = Quit")
     print()
 
-
     while True:
 
         command = camera_input.get_command()
 
 
-    # -------------------------
-    # PREVIEW
-    # -------------------------
+        # -------------------------
+        # Navigation controls
+        # -------------------------
+
+        if command == "LEFT":
+
+            navigation.move_left()
+
+
+        elif command == "RIGHT":
+
+            navigation.move_right()
+
+
+        elif command == "QUIT":
+
+            break
+
+
+        # -------------------------
+        # PREVIEW
+        # -------------------------
 
         if current_screen == Screen.PREVIEW:
 
-        # Capture preview frame
+            # Capture preview frame
+
             frame = picam2.capture_array()
 
-        # Fix colour order
+
+            # Fix colour order
+
             frame = frame[:, :, ::-1]
 
-        # Convert to PIL image
+
+            # Convert to PIL image
+
             image = Image.fromarray(frame)
 
-        # Display
+
+            # Draw navigation bar
+
+            image = navigation_renderer.draw(
+                image,
+                navigation.index
+            )
+
+
+            # Display
+
             display.show(image)
 
 
-        # Handle commands
-            if command == "TAKE_PHOTO":
+            # ---------------------
+            # Preview commands
+            # ---------------------
+
+            if command == "SHUTTER":
+
                 take_photo()
 
 
-            elif command == "GALLERY":
-                current_screen = Screen.GALLERY
-                print("Gallery selected")
+            elif command == "SELECT":
 
-            elif command == "MENU":
-                current_screen = Screen.MENU
-                print("Menu selected")
-            elif command == "QUIT":
-                break
+                current_screen = navigation.current()
+
+                print(
+                    "Selected:",
+                    current_screen
+                )
 
 
-    # -------------------------
-    # GALLERY
-    # -------------------------
+        # -------------------------
+        # GALLERY
+        # -------------------------
 
         elif current_screen == Screen.GALLERY:
-            print("Gallery screen")
 
-            if command == "BACK":
+            # Temporary placeholder
+
+            gallery_image = Image.new(
+                "RGB",
+                (320, 240),
+                "black"
+            )
+
+            draw = ImageDraw.Draw(gallery_image)
+
+            draw.text(
+                (120, 110),
+                "GALLERY",
+                fill="white"
+            )
+
+            display.show(gallery_image)
+
+
+            if command == "SELECT":
+
                 current_screen = Screen.PREVIEW
 
-            elif command == "QUIT":
-                break
+
+        # -------------------------
+        # SETTINGS
+        # -------------------------
+
+        elif current_screen == Screen.SETTINGS:
+
+            settings_image = Image.new(
+                "RGB",
+                (320, 240),
+                "black"
+            )
+
+            draw = ImageDraw.Draw(settings_image)
+
+            draw.text(
+                (110, 110),
+                "SETTINGS",
+                fill="white"
+            )
+
+            display.show(settings_image)
 
 
-    # -------------------------
-    # MENU
-    # -------------------------
+            if command == "SELECT":
 
-        elif current_screen == Screen.MENU:
-            print("Menu screen")
-
-            if command == "BACK":
                 current_screen = Screen.PREVIEW
 
-            elif command == "QUIT":
-                break
 
+        # -------------------------
+        # POWER
+        # -------------------------
+
+        elif current_screen == Screen.POWER:
+
+            power_image = Image.new(
+                "RGB",
+                (320, 240),
+                "black"
+            )
+
+            draw = ImageDraw.Draw(power_image)
+
+            draw.text(
+                (125, 110),
+                "POWER",
+                fill="white"
+            )
+
+            display.show(power_image)
+
+            if command == "SELECT":
+
+                current_screen = Screen.PREVIEW
 
 except KeyboardInterrupt:
 

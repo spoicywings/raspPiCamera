@@ -19,20 +19,23 @@ class CameraInput:
 
             key = sys.stdin.read(1)
 
-            if key == " ":
-                return "TAKE_PHOTO"
+            if key in ("a", "A"):
+                return "LEFT"
 
-            elif key in ("g", "G"):
-                return "GALLERY"
+            elif key in ("d", "D"):
+                return "RIGHT"
 
-            elif key in ("m", "M"):
-                return "MENU"
+            elif key in ("\n", "\r"):
+                return "SELECT"
+
+            elif key == " ":
+                return "SHUTTER"
+
+            elif key in ("f", "F"):
+                return "AUTOFOCUS"
 
             elif key in ("q", "Q"):
                 return "QUIT"
-
-            elif key == "\x1b":
-                return "BACK"
 
         return None
 

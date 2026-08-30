@@ -2,6 +2,13 @@ class Screen:
 
     PREVIEW = "PREVIEW"
     GALLERY = "GALLERY"
-    MENU = "MENU"
+    SETTINGS = "SETTINGS"
+    POWER = "POWER"
 
-    
+
+# Main navigation
+NAV_ITEMS = [
+    Screen.GALLERY,
+    Screen.SETTINGS,
+    Screen.POWER
+]
