@@ -1,5 +1,6 @@
 from picamera2 import Picamera2
 from PIL import Image
+from PIL import ImageDraw
 from display import Display
 import time
 import os
@@ -124,6 +125,30 @@ def take_photo():
     print(jpg_path)
     #print(dng_path)
 
+    # Display Saved image on preview screen
+    saved_image = Image.new("RGB", (320,240), "black")
+
+    
+
+    draw = ImageDraw.Draw(saved_image)
+    text = "PHOTO SAVED"
+
+    bbox = draw.textbbox((0, 0), text)
+    text_width = bbox[2] - bbox[0]
+    text_height = bbox[3] - bbox[1]
+
+    x = (320 - text_width) // 2
+    y = (240 - text_height) // 2
+
+    draw.text(
+        (x, y),
+        text,
+        fill="white"
+    )
+
+    display.show(saved_image)
+
+    time.sleep(1) # Wait 1 second before returning back
 
     # Return to preview
 
