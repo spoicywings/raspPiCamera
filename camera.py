@@ -234,9 +234,9 @@ try:
         # -------------------------
 
         elif current_screen == Screen.GALLERY:
-          # -------------------------
-          # Handle input
-          # -------------------------
+            # -------------------------
+            # Handle input
+            # -------------------------
 
             if command == "LEFT":
 
@@ -273,17 +273,18 @@ try:
 
                     current_screen = Screen.PREVIEW
 
-                    # Force preview to redraw
                     continue
 
 
             # -------------------------
-            # Draw Gallery
+            # Photo changed
             # -------------------------
 
-            if gallery.needs_redraw:
+            if gallery.photo_changed:
 
                 photo_path = gallery.current_photo()
+
+
                 # -------------------------
                 # No photos
                 # -------------------------
@@ -308,7 +309,7 @@ try:
 
 
                 # -------------------------
-                # Display photo
+                # Load photo
                 # -------------------------
 
                 else:
@@ -351,33 +352,31 @@ try:
                     )
 
 
-                # -------------------------
-                # Draw Gallery navigation
-                # -------------------------
+                gallery.mark_photo_clean()
 
-                gallery_image = gallery_renderer.draw(
+                gallery.ui_changed = True
+
+
+            # -------------------------
+            # UI changed
+            # -------------------------
+
+            if gallery.ui_changed:
+
+                gallery_image = gallery_renderer.draw_navigation(
                     gallery_image,
                     gallery
                 )
 
+                display.show(gallery_image)
 
-                # -------------------------
-                # Send to LCD
-                # -------------------------
-
-                display.show(
-                    gallery_image
-                )
+                gallery.mark_ui_clean()
 
 
-                # Gallery is now up to date
 
-                gallery.mark_clean()
-
-
-                # -------------------------
-                # SETTINGS
-                # -------------------------
+        # -------------------------
+        # SETTINGS
+        # -------------------------
 
         elif current_screen == Screen.SETTINGS:
 

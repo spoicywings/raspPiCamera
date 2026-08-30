@@ -3,7 +3,7 @@ from PIL import ImageDraw
 
 class GalleryRenderer:
 
-    def draw(
+    def draw_navigation(
         self,
         image,
         gallery
@@ -16,9 +16,7 @@ class GalleryRenderer:
         bar_height = 35
 
 
-        # -------------------------
-        # Navigation bar
-        # -------------------------
+        # Navigation background
 
         draw.rectangle(
             (
@@ -52,7 +50,6 @@ class GalleryRenderer:
             )
 
             text_width = bbox[2] - bbox[0]
-
             text_height = bbox[3] - bbox[1]
 
 
@@ -74,7 +71,7 @@ class GalleryRenderer:
             )
 
 
-            # Selection indicator
+            # Selected item
 
             if i == gallery.menu_index:
 

@@ -7,20 +7,20 @@ class Gallery:
 
         self.photo_dir = photo_dir
 
-        # List of JPEG photos
         self.photos = []
 
-        # Currently displayed photo
         self.photo_index = 0
 
-        # Currently selected Gallery menu item
         # 0 = Previous
         # 1 = Next
         # 2 = Back
         self.menu_index = 0
 
-        # Tells camera.py whether the LCD needs updating
-        self.needs_redraw = True
+        # Photo needs loading/rendering
+        self.photo_changed = True
+
+        # UI/navigation needs redrawing
+        self.ui_changed = True
 
         self.refresh()
 
@@ -37,10 +37,7 @@ class Gallery:
             if filename.lower().endswith(".jpg")
         ]
 
-        # Newest first
         self.photos.sort(reverse=True)
-
-        # Keep photo index valid
 
         if not self.photos:
 
@@ -50,8 +47,8 @@ class Gallery:
 
             self.photo_index = len(self.photos) - 1
 
-
-        self.needs_redraw = True
+        self.photo_changed = True
+        self.ui_changed = True
 
 
     # -------------------------
@@ -61,7 +58,6 @@ class Gallery:
     def current_photo(self):
 
         if not self.photos:
-
             return None
 
         return os.path.join(
@@ -82,10 +78,10 @@ class Gallery:
         self.photo_index += 1
 
         if self.photo_index >= len(self.photos):
-
             self.photo_index = 0
 
-        self.needs_redraw = True
+        self.photo_changed = True
+        self.ui_changed = True
 
 
     def previous_photo(self):
@@ -96,14 +92,14 @@ class Gallery:
         self.photo_index -= 1
 
         if self.photo_index < 0:
-
             self.photo_index = len(self.photos) - 1
 
-        self.needs_redraw = True
+        self.photo_changed = True
+        self.ui_changed = True
 
 
     # -------------------------
-    # Gallery menu navigation
+    # Menu navigation
     # -------------------------
 
     def menu_left(self):
@@ -111,10 +107,10 @@ class Gallery:
         self.menu_index -= 1
 
         if self.menu_index < 0:
-
             self.menu_index = 2
 
-        self.needs_redraw = True
+        # Only UI changed
+        self.ui_changed = True
 
 
     def menu_right(self):
@@ -122,10 +118,10 @@ class Gallery:
         self.menu_index += 1
 
         if self.menu_index > 2:
-
             self.menu_index = 0
 
-        self.needs_redraw = True
+        # Only UI changed
+        self.ui_changed = True
 
 
     def current_menu(self):
@@ -134,9 +130,14 @@ class Gallery:
 
 
     # -------------------------
-    # Redraw control
+    # Mark changes as handled
     # -------------------------
 
-    def mark_clean(self):
+    def mark_photo_clean(self):
 
-        self.needs_redraw = False
+        self.photo_changed = False
+
+
+    def mark_ui_clean(self):
+
+        self.ui_changed = False
