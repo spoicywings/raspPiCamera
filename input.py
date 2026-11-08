@@ -2,6 +2,7 @@ import sys
 import select
 import termios
 import tty
+from gpiozero import Button
 
 
 class CameraInput:
@@ -11,9 +12,17 @@ class CameraInput:
         self.old_settings = termios.tcgetattr(sys.stdin)
 
         tty.setcbreak(sys.stdin.fileno())
-
-
+        self.shutter = Button(
+                    22,
+                    pull_up=True,
+                    bounce_time=0.1
+                )
+        
     def get_command(self):
+
+        if self.shutter.is_pressed:
+            self.shutter.wait_for_release()
+            return "SHUTTER"
 
         if select.select([sys.stdin], [], [], 0)[0]:
 
@@ -47,3 +56,4 @@ class CameraInput:
             termios.TCSADRAIN,
             self.old_settings
         )
+        self.shutter.close()
