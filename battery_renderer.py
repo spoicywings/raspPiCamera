@@ -2,9 +2,12 @@ from PIL import ImageDraw
 
 class BatteryRenderer:
 
-    def draw(self, image, percent):
+    def draw(self, image, percent, charging=False):
 
         draw = ImageDraw.Draw(image)
+
+        # Green when charging, white otherwise
+        color = (0, 255, 0) if charging else (255, 255, 255)
 
         # Battery icon dimensions
         x = 282
@@ -15,14 +18,14 @@ class BatteryRenderer:
         # Battery outline
         draw.rectangle(
             (x, y, x + width, y + height),
-            outline="white",
+            outline=color,
             width=1
         )
 
         # Battery terminal
         draw.rectangle(
             (x + width, y + 4, x + width + 3, y + 10),
-            fill="white"
+            fill=color
         )
 
         # Battery fill
@@ -36,10 +39,10 @@ class BatteryRenderer:
                     x + 2 + fill_width,
                     y + height - 2
                 ),
-                fill="white"
+                fill=color
             )
 
-        # Percentage, positioned closer to icon
+        # Percentage
         text = f"{int(percent)}%"
         bbox = draw.textbbox((0, 0), text)
         text_width = bbox[2] - bbox[0]
@@ -47,7 +50,7 @@ class BatteryRenderer:
         draw.text(
             (x - text_width - 5, y + 2),
             text,
-            fill="white"
+            fill=color
         )
 
         return image
