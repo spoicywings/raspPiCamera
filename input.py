@@ -67,6 +67,13 @@ class CameraInput:
             if key in ("f", "F"):
                 return "AUTOFOCUS"
 
+            elif key in ("a", "A"):
+                return "LEFT"
+            elif key in ("d", "D"):
+                return "RIGHT"
+            elif key in (" "):
+                return "SELECT"
+
             elif key in ("q", "Q"):
                 return "QUIT"
         return None
