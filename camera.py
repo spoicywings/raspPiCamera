@@ -249,7 +249,7 @@ try:
                 battery_renderer.draw(
                 image,
                 battery_status["percent"],
-                charging=battery_status["current"] > 0.02
+                charging=battery_status["current"] > 0.001
             )
 
             # Display
@@ -284,7 +284,7 @@ try:
                         battery_renderer.draw(
                         power_image,
                         battery_status["percent"],
-                        charging=battery_status["current"] > 0.02
+                        charging=battery_status["current"] > 0.001
                     )
                     display.show(power_image)
 
@@ -438,7 +438,7 @@ try:
                     battery_renderer.draw(
                     image,
                     battery_status["percent"],
-                    charging=battery_status["current"] > 0.02
+                    charging=battery_status["current"] > 0.001
                     )
                 display.show(gallery_image)
 
@@ -462,7 +462,7 @@ try:
                 battery_renderer.draw(
                 settings_image,
                 battery_status["percent"],
-                charging=battery_status["current"] > 0.02
+                charging=battery_status["current"] > 0.001
             )
 
             draw = ImageDraw.Draw(settings_image)
@@ -527,7 +527,7 @@ try:
                 battery_renderer.draw(
                 power_image,
                 battery_status["percent"],
-                charging=battery_status["current"] > 0.02
+                charging=battery_status["current"] > 0.001
                 )
             display.show(power_image)
 
