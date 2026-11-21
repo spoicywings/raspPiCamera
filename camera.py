@@ -11,6 +11,7 @@ from navigation import Navigation
 from navigation_renderer import NavigationRenderer
 from gallery import Gallery
 from gallery_renderer import GalleryRenderer
+from power_renderer import PowerRenderer
 
 # Folder for saved photos
 PHOTO_DIR = "/home/johnny_pi/camera/photos"
@@ -50,8 +51,10 @@ navigation = Navigation()
 navigation_renderer = NavigationRenderer()
 gallery = Gallery(PHOTO_DIR)
 gallery_renderer = GalleryRenderer()
+power_renderer = PowerRenderer()
 screen_changed = True
-
+power_menu_index = 1  # 0 = YES, 1 = NO
+shutdown_requested = False
 
 # -----------------------------
 # Take photo
@@ -230,6 +233,12 @@ try:
                     "Selected:",
                     current_screen
                 )
+                if current_screen == Screen.POWER:
+
+                    power_menu_index = 1
+
+                    power_image = power_renderer.draw(power_menu_index)
+                    display.show(power_image)
 
 
         # -------------------------
@@ -419,26 +428,42 @@ try:
 
         elif current_screen == Screen.POWER:
 
-            power_image = Image.new(
-                "RGB",
-                (320, 240),
-                "black"
-            )
+            # Reset menu when entering Power screen
+            if screen_changed:
 
-            draw = ImageDraw.Draw(power_image)
+                power_menu_index = 1  # Default to NO
+                screen_changed = False
 
-            draw.text(
-                (125, 110),
-                "POWER",
-                fill="white"
-            )
+            # Handle input
 
+            if command == "LEFT":
+
+                power_menu_index = (power_menu_index - 1) % 2
+
+            elif command == "RIGHT":
+
+                power_menu_index = (power_menu_index + 1) % 2
+
+            elif command == "SELECT":
+
+                # YES - Shut down Raspberry Pi
+                if power_menu_index == 0:
+
+                    print("Shutdown confirmed")
+
+                    shutdown_requested = True
+                    break
+
+                # NO - Return to Preview
+                elif power_menu_index == 1:
+
+                    current_screen = Screen.PREVIEW
+                    screen_changed = True
+                    continue
+
+            # Draw Power menu
+            power_image = power_renderer.draw(power_menu_index)
             display.show(power_image)
-
-            if command == "SELECT":
-
-                current_screen = Screen.PREVIEW
-                screen_changed = True
 
 except KeyboardInterrupt:
 
@@ -455,3 +480,12 @@ finally:
     picam2.stop()
 
     print("Camera stopped")
+
+    # Shut down Raspberry Pi if requested
+    if shutdown_requested:
+
+        print("Powering off Raspberry Pi...")
+
+        os.system(
+            "sudo -n /usr/sbin/shutdown -h now"
+        )
