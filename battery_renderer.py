@@ -7,9 +7,9 @@ class BatteryRenderer:
         draw = ImageDraw.Draw(image)
 
         # Battery icon dimensions
-        x = 260
+        x = 282
         y = 10
-        width = 27
+        width = 24
         height = 14
 
         # Battery outline
@@ -39,11 +39,13 @@ class BatteryRenderer:
                 fill="white"
             )
 
-        # Percentage
+        # Percentage, positioned closer to icon
         text = f"{int(percent)}%"
+        bbox = draw.textbbox((0, 0), text)
+        text_width = bbox[2] - bbox[0]
 
         draw.text(
-            (x - 40, y + 2),
+            (x - text_width - 5, y + 2),
             text,
             fill="white"
         )
