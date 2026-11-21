@@ -11,8 +11,6 @@ GPIO 22: Select
 GPIO 18: Right/Down
 """
 
-
-
 class CameraInput:
 
     def __init__(self):
@@ -36,7 +34,7 @@ class CameraInput:
                     bounce_time=0.1
                 )
         self.right = Button(
-                    18,
+                    23,
                     pull_up=True,
                     bounce_time=0.1
                 )
