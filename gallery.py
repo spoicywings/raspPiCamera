@@ -109,26 +109,34 @@ class Gallery:
 
     def menu_left(self):
 
-        if self.confirm_delete:
-            return
-
         self.menu_index -= 1
 
-        if self.menu_index < 0:
-            self.menu_index = 3
+        if self.confirm_delete:
+
+            if self.menu_index < 0:
+                self.menu_index = 1
+
+        else:
+
+            if self.menu_index < 0:
+                self.menu_index = 3
 
         self.ui_changed = True
 
 
     def menu_right(self):
 
-        if self.confirm_delete:
-            return
-
         self.menu_index += 1
 
-        if self.menu_index > 3:
-            self.menu_index = 0
+        if self.confirm_delete:
+
+            if self.menu_index > 1:
+                self.menu_index = 0
+
+        else:
+
+            if self.menu_index > 3:
+                self.menu_index = 0
 
         self.ui_changed = True
 
@@ -195,3 +203,30 @@ class Gallery:
     def mark_ui_clean(self):
 
         self.ui_changed = False
+
+    def next_photo(self):
+
+        if not self.photos:
+            return
+
+        self.photo_index += 1
+
+        if self.photo_index >= len(self.photos):
+            self.photo_index = 0
+
+        self.photo_changed = True
+        self.ui_changed = True
+
+
+    def previous_photo(self):
+
+        if not self.photos:
+            return
+
+        self.photo_index -= 1
+
+        if self.photo_index < 0:
+            self.photo_index = len(self.photos) - 1
+
+        self.photo_changed = True
+        self.ui_changed = True
