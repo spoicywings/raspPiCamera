@@ -15,32 +15,38 @@ class CameraInput:
 
     def __init__(self):
 
-        self.old_settings = termios.tcgetattr(sys.stdin)
+        # Enable keyboard input only when a terminal is available
+        self.keyboard_enabled = sys.stdin.isatty()
+        self.old_settings = None
 
-        tty.setcbreak(sys.stdin.fileno())
+        if self.keyboard_enabled:
+            self.old_settings = termios.tcgetattr(sys.stdin)
+            tty.setcbreak(sys.stdin.fileno())
+
         self.shutter = Button(
-                    26,
-                    pull_up=True,
-                    bounce_time=0.1
-                )
-        self.select = Button(
-                    22,
-                    pull_up=True,
-                    bounce_time=0.1
-                )
-        self.left = Button(
-                    19,
-                    pull_up=True,
-                    bounce_time=0.1
-                )
-        self.right = Button(
-                    23,
-                    pull_up=True,
-                    bounce_time=0.1
-                )
+            26,
+            pull_up=True,
+            bounce_time=0.1
+        )
 
-        
-        
+        self.select = Button(
+            22,
+            pull_up=True,
+            bounce_time=0.1
+        )
+
+        self.left = Button(
+            19,
+            pull_up=True,
+            bounce_time=0.1
+        )
+
+        self.right = Button(
+            23,
+            pull_up=True,
+            bounce_time=0.1
+        )
+
     def get_command(self):
 
         if self.shutter.is_pressed:
@@ -59,31 +65,40 @@ class CameraInput:
             self.right.wait_for_release()
             return "RIGHT"
 
-        if select.select([sys.stdin], [], [], 0)[0]:
+        # Only check keyboard when a terminal is available
+        if self.keyboard_enabled:
 
-            key = sys.stdin.read(1)
-            if key in ("f", "F"):
-                return "AUTOFOCUS"
+            if select.select([sys.stdin], [], [], 0)[0]:
 
-            elif key in ("a", "A"):
-                return "LEFT"
-            elif key in ("d", "D"):
-                return "RIGHT"
-            elif key in (" "):
-                return "SELECT"
+                key = sys.stdin.read(1)
 
-            elif key in ("q", "Q"):
-                return "QUIT"
+                if key in ("f", "F"):
+                    return "AUTOFOCUS"
+
+                elif key in ("a", "A"):
+                    return "LEFT"
+
+                elif key in ("d", "D"):
+                    return "RIGHT"
+
+                elif key == " ":
+                    return "SELECT"
+
+                elif key in ("q", "Q"):
+                    return "QUIT"
+
         return None
-
 
     def close(self):
 
-        termios.tcsetattr(
-            sys.stdin,
-            termios.TCSADRAIN,
-            self.old_settings
-        )
+        # Restore terminal settings only if they were changed
+        if self.keyboard_enabled and self.old_settings is not None:
+            termios.tcsetattr(
+                sys.stdin,
+                termios.TCSADRAIN,
+                self.old_settings
+            )
+
         self.shutter.close()
         self.select.close()
         self.left.close()
