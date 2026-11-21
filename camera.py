@@ -12,6 +12,8 @@ from navigation_renderer import NavigationRenderer
 from gallery import Gallery
 from gallery_renderer import GalleryRenderer
 from power_renderer import PowerRenderer
+from battery import Battery
+from battery_renderer import BatteryRenderer
 
 # Folder for saved photos
 PHOTO_DIR = "/home/johnny_pi/camera/photos"
@@ -52,6 +54,15 @@ navigation_renderer = NavigationRenderer()
 gallery = Gallery(PHOTO_DIR)
 gallery_renderer = GalleryRenderer()
 power_renderer = PowerRenderer()
+
+# Battery monitoring
+battery_renderer = BatteryRenderer()
+battery = None
+battery_status = None
+
+BATTERY_REFRESH_INTERVAL = 10
+last_battery_update = 0
+
 screen_changed = True
 power_menu_index = 1  # 0 = YES, 1 = NO
 shutdown_requested = False
@@ -161,6 +172,32 @@ try:
 
         command = camera_input.get_command()
 
+        # -------------------------
+        # Battery monitoring
+        # -------------------------
+
+        battery_updated = False
+
+        if time.monotonic() - last_battery_update >= BATTERY_REFRESH_INTERVAL:
+
+            last_battery_update = time.monotonic()
+
+            try:
+                # Initialise sensor if not already available
+                if battery is None:
+                    battery = Battery()
+
+                battery_status = battery.get_status()
+                battery_updated = True
+
+                print(
+                    f"Battery: {battery_status['percent']:.1f}% "
+                    f"({battery_status['voltage']:.3f}V)"
+                )
+
+            except Exception as e:
+                print("Battery reading error:", e)
+
 
         # -------------------------
         # Navigation controls
@@ -208,7 +245,11 @@ try:
                 image,
                 navigation.index
             )
-
+            if battery_status is not None:
+                battery_renderer.draw(
+                image,
+                battery_status["percent"]
+            )
 
             # Display
 
@@ -238,6 +279,11 @@ try:
                     power_menu_index = 1
 
                     power_image = power_renderer.draw(power_menu_index)
+                    if battery_status is not None:
+                        battery_renderer.draw(
+                        power_image,
+                        battery_status["percent"]
+                    )
                     display.show(power_image)
 
 
@@ -380,13 +426,17 @@ try:
             # UI changed
             # -------------------------
 
-            if gallery.ui_changed:
+            if gallery.ui_changed or battery_updated:
 
                 gallery_image = gallery_renderer.draw_navigation(
                     gallery_image,
                     gallery
                 )
-
+                if battery_status is not None:
+                    battery_renderer.draw(
+                    image,
+                    battery_status["percent"]
+                    )
                 display.show(gallery_image)
 
                 gallery.mark_ui_clean()
@@ -403,6 +453,12 @@ try:
                 "RGB",
                 (320, 240),
                 "black"
+            )
+
+            if battery_status is not None:
+                battery_renderer.draw(
+                settings_image,
+                battery_status["percent"]
             )
 
             draw = ImageDraw.Draw(settings_image)
@@ -463,6 +519,11 @@ try:
 
             # Draw Power menu
             power_image = power_renderer.draw(power_menu_index)
+            if battery_status is not None:
+                battery_renderer.draw(
+                power_image,
+                battery_status["percent"]
+                )
             display.show(power_image)
 
 except KeyboardInterrupt:

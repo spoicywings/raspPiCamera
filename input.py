@@ -8,7 +8,7 @@ from gpiozero import Button
 GPIO 26: Shutter
 GPIO 19: Left/Up
 GPIO 22: Select
-GPIO 18: Right/Down
+GPIO 23: Right/Down
 """
 
 class CameraInput:
