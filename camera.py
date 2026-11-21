@@ -50,6 +50,8 @@ navigation = Navigation()
 navigation_renderer = NavigationRenderer()
 gallery = Gallery(PHOTO_DIR)
 gallery_renderer = GalleryRenderer()
+screen_changed = True
+
 
 # -----------------------------
 # Take photo
@@ -222,6 +224,7 @@ try:
             elif command == "SELECT":
 
                 current_screen = navigation.current()
+                screen_changed = True
 
                 print(
                     "Selected:",
@@ -234,6 +237,11 @@ try:
         # -------------------------
 
         elif current_screen == Screen.GALLERY:
+
+            if screen_changed:
+                gallery.refresh()
+                screen_changed = False
+
             # -------------------------
             # Handle input
             # -------------------------
@@ -298,7 +306,7 @@ try:
                     elif selected == 3:
 
                         current_screen = Screen.PREVIEW
-
+                        screen_changed = True
                         continue
 
 
@@ -402,6 +410,7 @@ try:
             if command == "SELECT":
 
                 current_screen = Screen.PREVIEW
+                screen_changed = True
 
 
         # -------------------------
@@ -429,6 +438,7 @@ try:
             if command == "SELECT":
 
                 current_screen = Screen.PREVIEW
+                screen_changed = True
 
 except KeyboardInterrupt:
 
