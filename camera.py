@@ -95,7 +95,7 @@ def take_photo():
     # Save JPEG
 
     picam2.capture_file(jpg_path)
-
+    gallery.refresh()
 
     # Capture RAW
 
@@ -253,27 +253,53 @@ try:
                 selected = gallery.current_menu()
 
 
-                # PREVIOUS
+                # -------------------------
+                # Delete confirmation
+                # -------------------------
 
-                if selected == 0:
+                if gallery.confirm_delete:
 
-                    gallery.previous_photo()
+                    if selected == 0:
+
+                        # YES - Delete photo
+                        gallery.confirm_delete_photo()
+
+                    elif selected == 1:
+
+                        # NO - Cancel deletion
+                        gallery.cancel_delete()
 
 
-                # NEXT
+                # -------------------------
+                # Normal gallery menu
+                # -------------------------
 
-                elif selected == 1:
+                else:
 
-                    gallery.next_photo()
+                    # PREVIOUS
+                    if selected == 0:
+
+                        gallery.previous_photo()
 
 
-                # BACK
+                    # NEXT
+                    elif selected == 1:
 
-                elif selected == 2:
+                        gallery.next_photo()
 
-                    current_screen = Screen.PREVIEW
 
-                    continue
+                    # DELETE
+                    elif selected == 2:
+
+                        gallery.start_delete_confirmation()
+
+
+                    # BACK
+                    elif selected == 3:
+
+                        current_screen = Screen.PREVIEW
+
+                        continue
 
 
             # -------------------------
@@ -285,10 +311,7 @@ try:
                 photo_path = gallery.current_photo()
 
 
-                # -------------------------
                 # No photos
-                # -------------------------
-
                 if photo_path is None:
 
                     gallery_image = Image.new(
@@ -297,9 +320,7 @@ try:
                         "black"
                     )
 
-                    draw = ImageDraw.Draw(
-                        gallery_image
-                    )
+                    draw = ImageDraw.Draw(gallery_image)
 
                     draw.text(
                         (120, 100),
@@ -308,24 +329,14 @@ try:
                     )
 
 
-                # -------------------------
                 # Load photo
-                # -------------------------
-
                 else:
 
-                    photo = Image.open(
-                        photo_path
-                    )
+                    photo = Image.open(photo_path)
 
-                    photo = photo.convert(
-                        "RGB"
-                    )
+                    photo = photo.convert("RGB")
 
-                    photo.thumbnail(
-                        (320, 200)
-                    )
-
+                    photo.thumbnail((320, 200))
 
                     gallery_image = Image.new(
                         "RGB",
@@ -333,18 +344,9 @@ try:
                         "black"
                     )
 
+                    x = (320 - photo.width) // 2
 
-                    x = (
-                        320 -
-                        photo.width
-                    ) // 2
-
-
-                    y = (
-                        35 +
-                        (205 - photo.height) // 2
-                    )
-
+                    y = 35 + (205 - photo.height) // 2
 
                     gallery_image.paste(
                         photo,
